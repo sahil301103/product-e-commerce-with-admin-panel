@@ -459,56 +459,42 @@ export default function AppRoot() {
       .catch(console.error);
   }
 
-  return (
+    return (
     <BrowserRouter>
       <style>{css}</style>
 
       <Routes>
         {/* Public e-commerce site */}
-        <Route path="/" element={
-          <div style={{ display: "flex" }}>
-            <div style={{ width: 260, padding: 18 }}>
-              <h3>Shop</h3>
-              <div className="small">Filters</div>
-              <div style={{ marginTop: 12 }}>
-                <div className="small">Selected categories: <span className="badge">{filters.categories.length}</span></div>
-                <div className="small">Selected brands: <span className="badge">{filters.brands.length}</span></div>
-              </div>
-              <div style={{ marginTop: 12 }}>
-                <Link to="/admin" className="small">Open Admin Panel →</Link>
-              </div>
-            </div>
+        <Route
+          path="/"
+          element={
+            loading ? (
+              <div style={{ padding: 40 }}>Loading products...</div>
+            ) : (
+              <Home
+                products={products}
+                onFetchMore={fetchMoreFromAPI}
+                filters={filters}
+                setFilters={setFilters}
+              />
+            )
+          }
+        />
 
-            <div style={{ flex: 1 }}>
-              {loading ? <div style={{ padding: 24 }}>Loading products...</div> :
-                <div style={{ padding: 18 }}>
-                  <Home products={products} onFetchMore={fetchMoreFromAPI} filters={filters} setFilters={setFilters} />
-                </div>
-              }
-            </div>
-          </div>
-        } />
+        {/* Admin Login */}
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Admin routes */}
-        <Route path="/admin/*" element={
-          <Routes>
-            <Route path="login" element={<AdminLogin />} />
-            <Route path="" element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={
-              <AdminRoute>
-                <AdminShell products={products} setProducts={setProducts} />
-              </AdminRoute>
-            } />
-            <Route path="products" element={
-              <AdminRoute>
-                <AdminShell products={products} setProducts={setProducts} />
-              </AdminRoute>
-            } />
-            <Route path="*" element={<Navigate to="/admin/login" replace />} />
-          </Routes>
-        } />
+        {/* Admin Protected Routes */}
+        <Route
+          path="/admin/*"
+          element={
+            <AdminRoute>
+              <AdminShell products={products} setProducts={setProducts} />
+            </AdminRoute>
+          }
+        />
 
-        {/* fallback */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
